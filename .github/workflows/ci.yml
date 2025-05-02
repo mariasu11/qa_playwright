@@ -1,0 +1,58 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+
+  smoke:
+    name: 🔥 Critical Smoke Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with: node-version: 16
+      - name: Install deps
+        run: npm ci
+      - name: Run smoke tests
+        run: npx playwright test tests/critical.spec.ts
+
+  e2e:
+    name: 🚀 Full E2E Suite (shard ${{ matrix.shard }})
+    needs: smoke
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        shard: [ '1/2', '2/2' ]
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with: node-version: 16
+      - name: Install deps
+        run: npm ci
+      - name: Run tests (shard ${{ matrix.shard }})
+        run: |
+          npx playwright test --shard=${{ matrix.shard }} --workers=2
+      - name: Upload HTML report
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: playwright-report-${{ matrix.shard }}
+          path: playwright-report/
+      - name: Upload videos
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: playwright-videos-${{ matrix.shard }}
+          path: test-results/videos/
+      - name: Upload screenshots
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: playwright-screenshots-${{ matrix.shard }}
+          path: test-results/screenshots/
