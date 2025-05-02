@@ -1,7 +1,6 @@
 # QA Playwright E2E Framework
 
 This repo shows a scalable, Page-Object-driven Playwright setup against Expedia.com  
-(or any site—just update `BASE_URL` and selectors).
 
 ## Features
 - **Page Objects** under `/pages`  
@@ -13,7 +12,7 @@ This repo shows a scalable, Page-Object-driven Playwright setup against Expedia.
 
 ## Quickstart
 
-git clone https://github.com/youruser/qa-playwright.git
+git clone https://github.com/mariasu11/qa_playwright.git
 cd qa-playwright
 npm install
 
